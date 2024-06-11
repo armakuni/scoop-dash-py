@@ -13,7 +13,16 @@ def server(base_url: URL) -> Generator[Popen[bytes], None, None]:
     import subprocess
 
     process = subprocess.Popen(
-        ["poetry", "run", "flask", "--app", "scoop_dash_py", "run", "--port", PORT]
+        [
+            "poetry",
+            "run",
+            "flask",
+            "--app",
+            "scoop_dash_py:create_app()",
+            "run",
+            "--port",
+            PORT,
+        ]
     )
 
     while True:

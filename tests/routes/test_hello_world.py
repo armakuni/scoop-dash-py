@@ -1,8 +1,8 @@
 from assertpy import assert_that
-from httpx import URL, Client
+from flask.testing import FlaskClient
 
 
-def test_hello(client: Client, base_url: URL) -> None:
-    response = client.get(f"{base_url}/hello/")
+def test_request_example(client: FlaskClient) -> None:
+    response = client.get("/hello/")
     assert_that(response).has_status_code(200)
     assert_that(response).has_text("hello, world")
