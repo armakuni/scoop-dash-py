@@ -1,10 +1,14 @@
-version: '3.8'
-
+name: scoop-dash-py
 services:
   db:
-    image: postgres:16
-    ports:
-      - target: 5432
-        published: 5433
     environment:
       POSTGRES_PASSWORD: scoopdash
+    image: postgres:16
+    networks:
+      default: null
+    ports:
+    - target: 5432
+      published: "5433"
+networks:
+  default:
+    name: scoop-dash-py_default
