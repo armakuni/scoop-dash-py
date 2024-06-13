@@ -13,6 +13,8 @@ jobs:
     uses: armakuni/github-actions/.github/workflows/lint-pipeline.yml@v0.19.3
 
   validate-python:
+    env:
+      DATABASE_URL: postgresql://postgres:scoopdash@postgres:5432/postgres
     services:
       # Label used to access the service container
       postgres:
@@ -29,7 +31,7 @@ jobs:
           --health-retries 5
         ports:
           # Maps tcp port 5432 on service container to the host
-          - 5432:5433
+          - 5432:5432
     defaults:
       run:
         shell: bash
