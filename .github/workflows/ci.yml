@@ -1,0 +1,88 @@
+name: Pipeline
+
+on:
+  push: ~
+  pull_request: ~
+  workflow_dispatch:
+
+env:
+  PYTHON_VERSION: 3.11
+
+jobs:
+  validate-pipeline:
+    uses: armakuni/github-actions/.github/workflows/lint-pipeline.yml@v0.19.3
+
+  validate-python:
+    defaults:
+      run:
+        shell: bash
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up python ${{ env.PYTHON_VERSION }}
+      id: setup-python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    - uses: armakuni/github-actions/setup-poetry@v0.19.3
+    - name: Install dependencies
+      shell: bash
+      run: poetry install --no-interaction --no-root
+    - run: make lint
+    - run: |
+        docker compose start
+    - run: make test
+    - run: make e2e
+
+  all-tests-succeeded:
+    needs: [ validate-pipeline, validate-python ]
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "All tests succeeded"
+
+  release:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    needs: [ all-tests-succeeded ]
+    name: Release
+    permissions:
+      contents: write
+    outputs:
+      version: ${{ steps.release.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up python ${{ env.PYTHON_VERSION }}
+        id: setup-python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: Load cached Poetry Binary
+        id: cached-poetry-binary
+        uses: actions/cache@v4
+        with:
+          path: ~/.local
+          key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}
+      - run: curl -sSL https://install.python-poetry.org | python3 -
+      - name: Load cached venv
+        id: cached-poetry-dependencies
+        uses: actions/cache@v4
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
+          restore-keys: |
+            venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-
+      - name: Install dependencies
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        shell: bash
+        run: poetry install --no-interaction --no-root
+
+      - name: Run deploy script
+        env:
+          RENDER_API_KEY: ${{secrets.RENDER_API_KEY}}
+          RENDER_DEPLOY_HOOK_KEY: ${{secrets.RENDER_DEPLOY_HOOK_KEY}}
+          COMMIT_REF: ${{github.sha}}
+          # This sets the commit ref to the current commit SHA
+        run: scripts/deploy.sh
