@@ -1,3 +1,4 @@
+import os
 import time
 from subprocess import Popen
 from typing import Generator
@@ -22,7 +23,8 @@ def server(base_url: URL) -> Generator[Popen[bytes], None, None]:
             "run",
             "--port",
             PORT,
-        ]
+        ],
+        env=dict(os.environ),
     )
 
     while True:
