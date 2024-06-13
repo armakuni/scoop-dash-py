@@ -46,8 +46,8 @@ jobs:
       shell: bash
       run: poetry install --no-interaction --no-root
     - run: make lint
-    - run: make test
     - run: alembic upgrade head
+    - run: make tests
     - run: make e2e
 
   all-tests-succeeded:
