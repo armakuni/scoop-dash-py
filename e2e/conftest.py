@@ -17,21 +17,20 @@ def server(base_url: URL) -> Generator[Popen[bytes], None, None]:
         [
             "poetry",
             "run",
-            "flask",
-            "--app",
-            "scoop_dash_py:create_app()",
-            "run",
-            "--port",
-            PORT,
+            "python",
+            "-m",
+            "src.scoop_dash_py",
         ],
-        env=dict(os.environ),
+        env=dict(os.environ) | {"PORT": PORT},
     )
 
-    while True:
+    counter = 0
+    while counter < 100:
         try:
             if Client().get(base_url):
                 break
         except ConnectError:
+            counter = counter + 1
             time.sleep(1)
 
     yield process
