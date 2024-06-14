@@ -1,10 +1,16 @@
 import logging
 from http import HTTPStatus
+from typing import cast
 
-from flask import Blueprint, Response, jsonify
+from flask import Blueprint, Response, jsonify, request
+
+from src.repositories.visitors.in_memory import VisitorRepo
+from src.services.visitors_service import InterestedVisitorsAppService
 
 logger = logging.getLogger(__name__)
 route = Blueprint("interested_visitors", __name__)
+
+vsisitor_repo = VisitorRepo()
 
 
 @route.route("/", methods=["GET"])
@@ -14,10 +20,15 @@ async def index() -> Response:
     # with session() as s:
     #     result = s.execute(select(InterestedVisitor))
     #     logger.debug(result)
-
-    return jsonify({"meta": {"count": 0}})
+    visitors_service = InterestedVisitorsAppService(vsisitor_repo)
+    visitors_count = visitors_service.get_visitors_count()
+    return jsonify({"meta": {"count": visitors_count}})
 
 
 @route.route("/", methods=["POST"])
 def create() -> tuple[Response, HTTPStatus]:
-    return jsonify({"meta": {"count": 1}}), HTTPStatus.CREATED
+    email = cast(str, request.json)
+    visitors_service = InterestedVisitorsAppService(vsisitor_repo)
+    visitors_service.register_visitor(email)
+    visitors_count = visitors_service.get_visitors_count()
+    return jsonify({"meta": {"count": visitors_count}}), HTTPStatus.CREATED
