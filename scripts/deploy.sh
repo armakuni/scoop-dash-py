@@ -26,6 +26,11 @@ check_deployment_status() {
 	echo "$deployment_status"
 }
 
+check_health() {
+	echo "Checking health status..."
+	curl --fail -L https://scoop-dash-py.onrender.com/hello/ -o /dev/null 
+}
+
 # Loop until the deployment status is "live"
 echo "Checking deployment status..."
 while true; do
@@ -38,3 +43,6 @@ while true; do
 		sleep 30 # Wait for 30 seconds before checking again
 	fi
 done
+
+
+check_health
