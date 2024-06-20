@@ -29,6 +29,7 @@ check_deployment_status() {
 check_health() {
 	echo "Checking health status..."
 	curl --fail -L https://scoop-dash-py.onrender.com/hello/v1 -o /dev/null 
+	
 }
 
 # Loop until the deployment status is "live"

@@ -99,3 +99,12 @@ jobs:
           COMMIT_REF: ${{github.sha}}
           # This sets the commit ref to the current commit SHA
         run: scripts/deploy.sh
+      - run: |
+            export COMMIT_REF="$(git show-ref --tags  $(git tag | sort -n | head -n1)  | cut -d ' ' -f  1)"
+            scripts/deploy.sh
+        env:
+          RENDER_API_KEY: ${{secrets.RENDER_API_KEY}}
+          RENDER_DEPLOY_HOOK_KEY: ${{secrets.RENDER_DEPLOY_HOOK_KEY}}
+        if: failure()
+
+          
