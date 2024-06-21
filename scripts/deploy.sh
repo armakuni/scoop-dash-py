@@ -1,6 +1,7 @@
 #!/bin/bash
 
 set -euo pipefail
+set -x
 
 # Trigger a build and extract deployment ID
 response=$(curl --silent --request POST "https://api.render.com/deploy/srv-cplb94ocmk4c739l4beg?key=$RENDER_DEPLOY_HOOK_KEY&ref=$COMMIT_REF" --header 'accept: application/json')
