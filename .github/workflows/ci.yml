@@ -101,7 +101,7 @@ jobs:
           # This sets the commit ref to the current commit SHA
         run: scripts/deploy.sh
       - run: | 
-            COMMIT_REF="$(git  rev-list -n 1  "$(git tag | sort -n | head -n1)"  | cut -d ' ' -f  1)"
+            COMMIT_REF="$(git  rev-list -n 1  "$(git tag | sort -n | tail -n1)"  | cut -d ' ' -f  1)"
             export COMMIT_REF
             scripts/deploy.sh
         env:
