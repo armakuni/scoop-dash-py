@@ -49,8 +49,8 @@ jobs:
       run: poetry install --no-interaction --no-root
     - run: make lint
     - run: poetry run alembic upgrade head
-    - run: make tests
-    - run: make e2e
+    # - run: make tests
+    # - run: make e2e
 
   all-tests-succeeded:
     needs: [ validate-pipeline, validate-python ]

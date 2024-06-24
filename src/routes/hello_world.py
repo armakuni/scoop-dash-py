@@ -11,9 +11,10 @@ route = Blueprint("hello", __name__)
 
 @route.route("/", methods=["GET"])
 def hello_world() -> str:
-    with Session(engine) as session:
-        service = GreeterAppService(GreetingRepo(session))
-        return service.run()
+    # with Session(engine) as session:
+    #     service = GreeterAppService(GreetingRepo(session))
+    #     return service.run()
+    raise Exception
 
 
 @route.route("/count/", methods=["GET"])
