@@ -111,7 +111,7 @@ jobs:
       - name: Create Tag
         id: tag
         run: |
-          TAG_NAME="working-$(( "$( git tag -n1 | cut -d "-" -f2 )" + 1 ))"
+          TAG_NAME="working-$(( "$( git tag  | tail -n1 | cut -d "-" -f2 )" + 1 ))"
           git tag "$TAG_NAME"
           git push origin "$TAG_NAME"
 
