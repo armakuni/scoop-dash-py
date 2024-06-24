@@ -63,11 +63,12 @@ jobs:
     if: github.ref == 'refs/heads/main'
     needs: [ all-tests-succeeded ]
     name: Release
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
       - name: Set up python ${{ env.PYTHON_VERSION }}
         id: setup-python
         uses: actions/setup-python@v5
@@ -107,5 +108,12 @@ jobs:
           RENDER_API_KEY: ${{secrets.RENDER_API_KEY}}
           RENDER_DEPLOY_HOOK_KEY: ${{secrets.RENDER_DEPLOY_HOOK_KEY}}
         if: failure()
+      - name: Create Tag
+        id: tag
+        run: |
+          TAG_NAME="working-$(( "$( git tag -n1 | cut -d "-" -f2 )" + 1 ))"
+          git tag "$TAG_NAME"
+          git push origin "$TAG_NAME"
+
 
           
